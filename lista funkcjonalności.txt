@@ -1,0 +1,9 @@
+logowanie i rejestracja
+menu główne
+gotowe zestawy mapek
+mapowanie dowolnego obrazu mapy
+mapa Google Maps + Google Earth
+wyszukiwanie punktów z Google Maps
+śledzenie postępów użytkownika w bazie danych
+ocenianie mapek przez użytkowników
+blokada IE
