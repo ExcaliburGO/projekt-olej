@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        *
+        {
+            margin: 0;
+            border: 0;
+        }
+        #map
+        {
+            position: absolute;
+            top:50vh;
+            left:50vw;
+            transform: translate(-50%, -50%);
+            height: 90vh;
+        }
+        #map #mapimg
+        {
+            height: 100%;
+        }
+        #debug
+        {
+            position: fixed;
+            margin:0;
+            top:1vh;
+            left:1vw;
+            font-size:2vh;
+        }
+        #answer
+        {
+            position: fixed;
+            margin:0;
+            top:4vh;
+            left:1vw;
+            font-size:2vh;
+        }
+        .marker
+        {
+            position: absolute;
+            display: block;
+            width: 1.3vh;
+            height: 1.3vh;
+            background-color: cyan;
+            border: .5vh solid blue;
+            border-radius: 50%;
+            z-index: 3;
+            transform: translate(-50%,-50%);
+        }
+        #map svg.canvas
+        {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index:2;
+        }
+    </style>
+</head>
+<body>
+    <div id="map">
+        <img id="mapimg">
+        <svg class="canvas">
+            <line x1="20" y1="0" x2="0" y2="0" style="stroke:rgb(255,0,0);stroke-width:2" />
+        </svg>
+    </div>
+    <p id="debug"></p>
+    <p id="answer"></p>
+    <script src="jquery-3.6.0.min.js"></script>
+    <script>
+        var objects = [
+            {
+            x_pos: "76",
+            y_pos: "88",
+            dot_text: "Woliński Park Narodowy"
+            },
+            {
+            x_pos: "78",
+            y_pos: "208",
+            dot_text: "Park Narodowy Ujście Warty"
+            },
+            {
+            x_pos: "158",
+            y_pos: "161",
+            dot_text: "Drwieński Park Narodowy"
+            },
+            {
+            x_pos: "249",
+            y_pos: "112",
+            dot_text: "Park Narodowy Bory Tucholskie"
+            },
+            {
+            x_pos: "196",
+            y_pos: "246",
+            dot_text: "Wielkopolski Park Narodowy"
+            },
+            {
+            x_pos: "110",
+            y_pos: "373",
+            dot_text: "Karkonowski Park Narodowy"
+            },
+            {
+            x_pos: "159",
+            y_pos: "411",
+            dot_text: "Park Narodowy Gór Stołowych"
+            },
+            {
+            x_pos: "377",
+            y_pos: "521",
+            dot_text: "Tatrzański Park Narodowy"
+            },
+            {
+            x_pos: "354",
+            y_pos: "491",
+            dot_text: "Babiogórski Park Narodowy"
+            },
+            {
+            x_pos: "394",
+            y_pos: "485",
+            dot_text: "Gorczański Park Narodowy"
+            },
+            {
+            x_pos: "408",
+            y_pos: "506",
+            dot_text: "Pieniński Park Narodowy"
+            },
+            {
+            x_pos: "469",
+            y_pos: "502",
+            dot_text: "Magurski Park Narodowy"
+            },
+            {
+            x_pos: "545",
+            y_pos: "530",
+            dot_text: "Bieszczadzki Park Narodowy"
+            },
+            {
+            x_pos: "392",
+            y_pos: "430",
+            dot_text: "Ojcowski Park Narodowy"
+            },
+            {
+            x_pos: "439",
+            y_pos: "389",
+            dot_text: "Świętokrzyski Park Narodowy"
+            },
+            {
+            x_pos: "573",
+            y_pos: "397",
+            dot_text: "Roztoczański Park Narodowy"
+            },
+            {
+            x_pos: "564",
+            y_pos: "321",
+            dot_text: "Poleski Park Narodowy"
+            },
+            {
+            x_pos: "592",
+            y_pos: "200",
+            dot_text: "Białowieski Park Narodowy"
+            },
+            {
+            x_pos: "542",
+            y_pos: "183",
+            dot_text: "Narwiański Park Narodowy"
+            },
+            {
+            x_pos: "532",
+            y_pos: "131",
+            dot_text: "Biebrzański Park Narodowy"
+            },
+            {
+            x_pos: "539",
+            y_pos: "85",
+            dot_text: "Wigierski Park Narodowy"
+            },
+            {
+            x_pos: "410",
+            y_pos: "250",
+            dot_text: "Kampinoski Park Narodowy"
+            },
+            {
+            x_pos: "234",
+            y_pos: "32",
+            dot_text: "Słowiański Park Narodowy"
+            }
+        ]
+        objects.sort((a, b) => 0.5 - Math.random());
+        var currObject=0;
+        var picking=true;
+        var mapImg=$("#mapimg")
+        mapImg.on("load", function() 
+        {
+            let mapImgPure = mapImg.get(0)
+            var imgW=mapImgPure.naturalWidth;
+            var imgH=mapImgPure.naturalHeight;
+            var w = mapImgPure.width;
+            var h = mapImgPure.height;
+            objects.forEach(function(e,i) {
+                let dot = document.createElement("div");
+                dot.classList.add("marker");
+                dot.style.left=e.x_pos/imgW*100+"%";
+                dot.style.top=e.y_pos/imgH*100+"%";
+                dot=$(dot)
+                e.marker=dot;
+                $("#map").append(dot);
+            });
+            $("#answer").text(objects[currObject].dot_text)
+        });
+        mapImg.attr("src","map1.jpg");
+        $(document).ready(function() {
+            var line=document.querySelector("#map svg.canvas line");
+            $("#map").on("click", function(event) {
+                if(picking)
+                {
+                    let mapImgPure = mapImg.get(0)
+                    var x = event.pageX - this.offsetLeft;
+                    var y = event.pageY - this.offsetTop;
+                    var w = mapImgPure.width;
+                    var h = mapImgPure.height;
+                    var imgW=mapImgPure.naturalWidth;
+                    var imgH=mapImgPure.naturalHeight;
+                    //$("#debug").text(objects[currObject].x_pos/imgW+" "+(x+w/2+1)/w);
+                    let missX = objects[currObject].x_pos/imgW-(x+w/2)/w;
+                    let missY = objects[currObject].y_pos/imgH-(y+h/2)/h;
+                    let miss = Math.sqrt(missX*missX+missY*missY)*100*100/Math.sqrt(20000);
+                    if(miss<0.8)
+                    {
+                        $("#answer").text("Dobrze!");
+                        objects[currObject].marker.css("background-color", "lime");
+                    }
+                    else
+                    {
+                        $("#answer").text("Pomyliłeś się o "+miss+"%");
+                        objects[currObject].marker.css("background-color", "red");
+                        line.x1.baseVal.value=objects[currObject].marker.get(0).offsetLeft;
+                        line.y1.baseVal.value=objects[currObject].marker.get(0).offsetTop;
+                        line.x2.baseVal.value=(x+w/2);
+                        line.y2.baseVal.value=(y+h/2);
+                    }
+                }
+                else
+                {
+                    objects[currObject].marker.css("background-color", "cyan");
+                    currObject++;
+                    $("#answer").text(objects[currObject].dot_text)
+                }
+                picking=!picking;
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        *
+        {
+            margin: 0;
+            border: 0;
+        }
+        #map
+        {
+            position: absolute;
+            top:50vh;
+            left:50vw;
+            transform: translate(-50%, -50%);
+            height: 90vh;
+        }
+        #map #mapimg
+        {
+            height: 100%;
+        }
+        #debug
+        {
+            position: fixed;
+            margin:0;
+            top:1vh;
+            left:1vw;
+            font-size:2vh;
+        }
+        #answer
+        {
+            position: fixed;
+            margin:0;
+            top:4vh;
+            left:1vw;
+            font-size:2vh;
+        }
+        .marker
+        {
+            position: absolute;
+            display: block;
+            width: 1.3vh;
+            height: 1.3vh;
+            background-color: cyan;
+            border: .5vh solid blue;
+            border-radius: 50%;
+            z-index: 3;
+            transform: translate(-50%,-50%);
+        }
+        #map svg.canvas
+        {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index:2;
+        }
+    </style>
+</head>
+<body>
+    <div id="map">
+        <img id="mapimg">
+        <svg class="canvas">
+            <line x1="20" y1="0" x2="0" y2="0" style="stroke:rgb(255,0,0);stroke-width:2" />
+        </svg>
+    </div>
+    <p id="debug"></p>
+    <p id="answer"></p>
+    <script src="jquery-3.6.0.min.js"></script>
+    <script>
+        var objects=[
+            {
+                x_pos: "443",
+                y_pos: "255",
+                dot_text: "Wisła"
+            },
+            {
+                x_pos: "402",
+                y_pos: "298",
+                dot_text: "Pilica"
+            },
+            {
+                x_pos: "348",
+                y_pos: "100",
+                dot_text: "Nogat"
+            },
+            {
+                x_pos: "146",
+                y_pos: "201",
+                dot_text: "Warta"
+            },
+            {
+                x_pos: "113",
+                y_pos: "169",
+                dot_text: "Odra"
+            },
+            {
+                x_pos: "441",
+                y_pos: "214",
+                dot_text: "Narew"
+            },
+            {
+                x_pos: "225",
+                y_pos: "174",
+                dot_text: "Noteć"
+            },
+            {
+                x_pos: "294",
+                y_pos: "173",
+                dot_text: "Kanał Bydgoski"
+            },
+            {
+                x_pos: "191",
+                y_pos: "92",
+                dot_text: "Parsęta"
+            },
+            {
+                x_pos: "171",
+                y_pos: "95",
+                dot_text: "Rega"
+            },
+            {
+                x_pos: "237",
+                y_pos: "76",
+                dot_text: "Wieprza"
+            },
+            {
+                x_pos: "281",
+                y_pos: "61",
+                dot_text: "Łeba"
+            },
+            {
+                x_pos: "282",
+                y_pos: "142",
+                dot_text: "Brda"
+            },
+            {
+                x_pos: "233",
+                y_pos: "144",
+                dot_text: "Gwda"
+            },
+            {
+                x_pos: "496",
+                y_pos: "312",
+                dot_text: "Wieprz"
+            },
+            {
+                x_pos: "561",
+                y_pos: "307",
+                dot_text: "Bug"
+            },
+            {
+                x_pos: "513",
+                y_pos: "220",
+                dot_text: "Nurzec"
+            },
+            {
+                x_pos: "386",
+                y_pos: "88",
+                dot_text: "Pasłęka"
+            },
+            {
+                x_pos: "517",
+                y_pos: "148",
+                dot_text: "Biebrza"
+            },
+            {
+                x_pos: "469",
+                y_pos: "150",
+                dot_text: "Pisa"
+            },
+            {
+                x_pos: "445",
+                y_pos: "158",
+                dot_text: "Omulew"
+            },
+            {
+                x_pos: "405",
+                y_pos: "254",
+                dot_text: "Bzura"
+            },
+            {
+                x_pos: "140",
+                y_pos: "310",
+                dot_text: "Nysa Łużcycka"
+            },
+            {
+                x_pos: "344",
+                y_pos: "307",
+                dot_text: "Widawka"
+            },
+            {
+                x_pos: "153",
+                y_pos: "264",
+                dot_text: "Bóbr"
+            },
+            {
+                x_pos: "193",
+                y_pos: "320",
+                dot_text: "Kaczawa"
+            },
+            {
+                x_pos: "213",
+                y_pos: "340",
+                dot_text: "Bystrzyca"
+            },
+            {
+                x_pos: "242",
+                y_pos: "374",
+                dot_text: "Nysa Kłodzka"
+            },
+            {
+                x_pos: "413",
+                y_pos: "390",
+                dot_text: "Nida"
+            },
+            {
+                x_pos: "459",
+                y_pos: "342",
+                dot_text: "Kamienna"
+            },
+            {
+                x_pos: "417",
+                y_pos: "422",
+                dot_text: "Dunajec"
+            },
+            {
+                x_pos: "397",
+                y_pos: "429",
+                dot_text: "Raba"
+            },
+            {
+                x_pos: "353",
+                y_pos: "430",
+                dot_text: "Skawa"
+            },
+            {
+                x_pos: "327",
+                y_pos: "436",
+                dot_text: "Soła"
+            },
+            {
+                x_pos: "281",
+                y_pos: "268",
+                dot_text: "Prosna"
+            },
+            {
+                x_pos: "301",
+                y_pos: "365",
+                dot_text: "Mała Panew"
+            },
+            {
+                x_pos: "434",
+                y_pos: "184",
+                dot_text: "Orzyc"
+            },
+            {
+                x_pos: "456",
+                y_pos: "412",
+                dot_text: "Wisłoka"
+            },
+            {
+                x_pos: "501",
+                y_pos: "395",
+                dot_text: "San"
+            },
+            {
+                x_pos: "497",
+                y_pos: "413",
+                dot_text: "Wisłok"
+            },
+            {
+                x_pos: "519",
+                y_pos: "389",
+                dot_text: "Tanew"
+            },
+            {
+                x_pos: "335",
+                y_pos: "399",
+                dot_text: "Przemsza"
+            },
+            {
+                x_pos: "308",
+                y_pos: "128",
+                dot_text: "Wda"
+            },
+            {
+                x_pos: "425",
+                y_pos: "94",
+                dot_text: "Łyna"
+            },
+            {
+                x_pos: "252",
+                y_pos: "69",
+                dot_text: "Słupia"
+            },
+            {
+                x_pos: "238",
+                y_pos: "198",
+                dot_text: "Wełna"
+            },
+            {
+                x_pos: "188",
+                y_pos: "159",
+                dot_text: "Drawa"
+            },
+            {
+                x_pos: "236",
+                y_pos: "268",
+                dot_text: "Obra"
+            },
+            {
+                x_pos: "541",
+                y_pos: "269",
+                dot_text: "Krzna"
+            },
+            {
+                x_pos: "499",
+                y_pos: "250",
+                dot_text: "Liwiec"
+            },
+            {
+                x_pos: "233",
+                y_pos: "297",
+                dot_text: "Barycz"
+            },
+            {
+                x_pos: "346",
+                y_pos: "173",
+                dot_text: "Drwęca"
+            },
+            {
+                x_pos: "407",
+                y_pos: "208",
+                dot_text: "Wkra"
+            },
+            {
+                x_pos: "351",
+                y_pos: "257",
+                dot_text: "Ner"
+            },
+            {
+                x_pos: "314",
+                y_pos: "112",
+                dot_text: "Wierzyca"
+            },
+            {
+                x_pos: "411",
+                y_pos: "455",
+                dot_text: "Poprad"
+            },
+            {
+                x_pos: "531",
+                y_pos: "127",
+                dot_text: "Kanał Augustowski"
+            },
+            {
+                x_pos: "537",
+                y_pos: "116",
+                dot_text: "Czarna Hańcza"
+            },
+            {
+                x_pos: "133",
+                y_pos: "102",
+                dot_text: "Świna"
+            },
+            {
+                x_pos: "521",
+                y_pos: "482",
+                dot_text: "Strwiąż"
+            },
+            {
+                x_pos: "362",
+                y_pos: "460",
+                dot_text: "Czarna Orawa"
+            },
+            {
+                x_pos: "157",
+                y_pos: "343",
+                dot_text: "Izera"
+            },
+            {
+                x_pos: "202",
+                y_pos: "384",
+                dot_text: "Dzika Orlica"
+            },
+            {
+                x_pos: "196",
+                y_pos: "378",
+                dot_text: "Czermnica"
+            },
+            {
+                x_pos: "183",
+                y_pos: "358",
+                dot_text: "Szkło"
+            },
+            {
+                x_pos: "360",
+                y_pos: "112",
+                dot_text: "Kanał Elbląski"
+            },
+            {
+                x_pos: "301",
+                y_pos: "394",
+                dot_text: "Kanał Gliwicki"
+            },
+            {
+                x_pos: "152",
+                y_pos: "312",
+                dot_text: "Kwisa"
+            },
+            {
+                x_pos: "458",
+                y_pos: "93",
+                dot_text: "Węgorapa"
+            },
+            {
+                x_pos: "344",
+                y_pos: "128",
+                dot_text: "Liwa"
+            },
+            {
+                x_pos: "338",
+                y_pos: "148",
+                dot_text: "Osa"
+            },
+            {
+                x_pos: "365",
+                y_pos: "205",
+                dot_text: "Skrwa"
+            },
+            {
+                x_pos: "201",
+                y_pos: "360",
+                dot_text: "Metuje"
+            }
+        ]
+        objects.sort((a, b) => 0.5 - Math.random());
+        var currObject=0;
+        var picking=true;
+        var mapImg=$("#mapimg")
+        mapImg.on("load", function() 
+        {
+            let mapImgPure = mapImg.get(0)
+            var imgW=mapImgPure.naturalWidth;
+            var imgH=mapImgPure.naturalHeight;
+            var w = mapImgPure.width;
+            var h = mapImgPure.height;
+            objects.forEach(function(e,i) {
+                let dot = document.createElement("div");
+                dot.classList.add("marker");
+                dot.style.left=e.x_pos/imgW*100+"%";
+                dot.style.top=e.y_pos/imgH*100+"%";
+                dot=$(dot)
+                e.marker=dot;
+                $("#map").append(dot);
+            });
+            $("#answer").text(objects[currObject].dot_text)
+        });
+        mapImg.attr("src","map1.jpg");
+        $(document).ready(function() {
+            var line=document.querySelector("#map svg.canvas line");
+            $("#map").on("click", function(event) {
+                if(picking)
+                {
+                    let mapImgPure = mapImg.get(0)
+                    var x = event.pageX - this.offsetLeft;
+                    var y = event.pageY - this.offsetTop;
+                    var w = mapImgPure.width;
+                    var h = mapImgPure.height;
+                    var imgW=mapImgPure.naturalWidth;
+                    var imgH=mapImgPure.naturalHeight;
+                    //$("#debug").text(objects[currObject].x_pos/imgW+" "+(x+w/2+1)/w);
+                    let missX = objects[currObject].x_pos/imgW-(x+w/2)/w;
+                    let missY = objects[currObject].y_pos/imgH-(y+h/2)/h;
+                    let miss = Math.sqrt(missX*missX+missY*missY)*100*100/Math.sqrt(20000);
+                    if(miss<0.8)
+                    {
+                        $("#answer").text("Dobrze!");
+                        objects[currObject].marker.css("background-color", "lime");
+                    }
+                    else
+                    {
+                        $("#answer").text("Pomyliłeś się o "+miss+"%");
+                        objects[currObject].marker.css("background-color", "red");
+                        line.x1.baseVal.value=objects[currObject].marker.get(0).offsetLeft;
+                        line.y1.baseVal.value=objects[currObject].marker.get(0).offsetTop;
+                        line.x2.baseVal.value=(x+w/2);
+                        line.y2.baseVal.value=(y+h/2);
+                    }
+                }
+                else
+                {
+                    objects[currObject].marker.css("background-color", "cyan");
+                    currObject++;
+                    $("#answer").text(objects[currObject].dot_text)
+                }
+                picking=!picking;
+            });
+        });
+    </script>
+</body>
+</html>

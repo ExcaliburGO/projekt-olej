@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        *
+        {
+            margin: 0;
+            border: 0;
+        }
+        #map
+        {
+            position: absolute;
+            top:50vh;
+            left:50vw;
+            transform: translate(-50%, -50%);
+            height: 90vh;
+        }
+        #map #mapimg
+        {
+            height: 100%;
+        }
+        #debug
+        {
+            position: fixed;
+            margin:0;
+            top:1vh;
+            left:1vw;
+            font-size:2vh;
+        }
+        #answer
+        {
+            position: fixed;
+            margin:0;
+            top:4vh;
+            left:1vw;
+            font-size:2vh;
+        }
+        .marker
+        {
+            position: absolute;
+            display: block;
+            width: 1.3vh;
+            height: 1.3vh;
+            background-color: cyan;
+            border: .5vh solid blue;
+            border-radius: 50%;
+            z-index: 3;
+            transform: translate(-50%,-50%);
+        }
+        #map svg.canvas
+        {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index:2;
+        }
+    </style>
+</head>
+<body>
+    <div id="map">
+        <img id="mapimg">
+        <svg class="canvas">
+            <line x1="20" y1="0" x2="0" y2="0" style="stroke:rgb(255,0,0);stroke-width:2" />
+        </svg>
+    </div>
+    <p id="debug"></p>
+    <p id="answer"></p>
+    <script src="jquery-3.6.0.min.js"></script>
+    <script>
+        var objects = [
+            {
+                "x_pos": "441",
+                "y_pos": "115",
+                "dot_text": "Białe"
+            },
+            {
+                "x_pos": "408",
+                "y_pos": "508",
+                "dot_text": "Czorsztyńskie"
+            },
+            {
+                "x_pos": "455",
+                "y_pos": "106",
+                "dot_text": "Tałty"
+            },
+            {
+                "x_pos": "166",
+                "y_pos": "66",
+                "dot_text": "Jamno"
+            },
+            {
+                "x_pos": "383",
+                "y_pos": "469",
+                "dot_text": "Dobczyckie"
+            },
+            {
+                "x_pos": "218",
+                "y_pos": "35",
+                "dot_text": "Gardno"
+            },
+            {
+                "x_pos": "266",
+                "y_pos": "98",
+                "dot_text": "Wdzydze"
+            },
+            {
+                "x_pos": "264",
+                "y_pos": "141",
+                "dot_text": "Koronowskie"
+            },
+            {
+                "x_pos": "172",
+                "y_pos": "132",
+                "dot_text": "Drawsko"
+            },
+            {
+                "x_pos": "208",
+                "y_pos": "113",
+                "dot_text": "Wielimie"
+            },
+            {
+                "x_pos": "108",
+                "y_pos": "245",
+                "dot_text": "Niesłysz"
+            },
+            {
+                "x_pos": "306",
+                "y_pos": "226",
+                "dot_text": "Głuszyńskie"
+            },
+            {
+                "x_pos": "283",
+                "y_pos": "224",
+                "dot_text": "Gopło"
+            },
+            {
+                "x_pos": "351",
+                "y_pos": "133",
+                "dot_text": "Jeziorak"
+            },
+            {
+                "x_pos": "441",
+                "y_pos": "229",
+                "dot_text": "Zegrzyńskie"
+            },
+            {
+                "x_pos": "83",
+                "y_pos": "152",
+                "dot_text": "Miedwie"
+            },
+            {
+                "x_pos": "72",
+                "y_pos": "132",
+                "dot_text": "Dąbie"
+            },
+            {
+                "x_pos": "235",
+                "y_pos": "30",
+                "dot_text": "Łebsko"
+            },
+            {
+                "x_pos": "588",
+                "y_pos": "193",
+                "dot_text": "Siemianowskie"
+            },
+            {
+                "x_pos": "546",
+                "y_pos": "79",
+                "dot_text": "Wigry"
+            },
+            {
+                "x_pos": "528",
+                "y_pos": "67",
+                "dot_text": "Hańcza"
+            },
+            {
+                "x_pos": "465",
+                "y_pos": "127",
+                "dot_text": "Nidzkie"
+            },
+            {
+                "x_pos": "467",
+                "y_pos": "79",
+                "dot_text": "Mamry"
+            },
+            {
+                "x_pos": "472",
+                "y_pos": "92",
+                "dot_text": "Niegocin"
+            },
+            {
+                "x_pos": "472",
+                "y_pos": "111",
+                "dot_text": "Śniarswy"
+            },
+            {
+                "x_pos": "337",
+                "y_pos": "220",
+                "dot_text": "Włocławskie"
+            },
+            {
+                "x_pos": "297",
+                "y_pos": "294",
+                "dot_text": "Jeziorsko"
+            },
+            {
+                "x_pos": "371",
+                "y_pos": "328",
+                "dot_text": "Sulejowskie"
+            },
+            {
+                "x_pos": "270",
+                "y_pos": "397",
+                "dot_text": "Turawskie"
+            },
+            {
+                "x_pos": "533",
+                "y_pos": "519",
+                "dot_text": "Solińskie"
+            },
+            {
+                "x_pos": "421",
+                "y_pos": "475",
+                "dot_text": "Rożnowskie"
+            },
+            {
+                "x_pos": "207",
+                "y_pos": "410",
+                "dot_text": "Otmuchowskie"
+            },
+            {
+                "x_pos": "220",
+                "y_pos": "406",
+                "dot_text": "Nyskie"
+            }
+        ];
+        objects.sort((a, b) => 0.5 - Math.random());
+        var currObject=0;
+        var picking=true;
+        var mapImg=$("#mapimg")
+        mapImg.on("load", function() 
+        {
+            let mapImgPure = mapImg.get(0)
+            var imgW=mapImgPure.naturalWidth;
+            var imgH=mapImgPure.naturalHeight;
+            var w = mapImgPure.width;
+            var h = mapImgPure.height;
+            objects.forEach(function(e,i) {
+                let dot = document.createElement("div");
+                dot.classList.add("marker");
+                dot.style.left=e.x_pos/imgW*100+"%";
+                dot.style.top=e.y_pos/imgH*100+"%";
+                dot=$(dot)
+                e.marker=dot;
+                $("#map").append(dot);
+            });
+            $("#answer").text(objects[currObject].dot_text)
+        });
+        mapImg.attr("src","map1.jpg");
+        $(document).ready(function() {
+            var line=document.querySelector("#map svg.canvas line");
+            $("#map").on("click", function(event) {
+                if(picking)
+                {
+                    let mapImgPure = mapImg.get(0)
+                    var x = event.pageX - this.offsetLeft;
+                    var y = event.pageY - this.offsetTop;
+                    var w = mapImgPure.width;
+                    var h = mapImgPure.height;
+                    var imgW=mapImgPure.naturalWidth;
+                    var imgH=mapImgPure.naturalHeight;
+                    //$("#debug").text(objects[currObject].x_pos/imgW+" "+(x+w/2+1)/w);
+                    let missX = objects[currObject].x_pos/imgW-(x+w/2)/w;
+                    let missY = objects[currObject].y_pos/imgH-(y+h/2)/h;
+                    let miss = Math.sqrt(missX*missX+missY*missY)*100*100/Math.sqrt(20000);
+                    if(miss<0.8)
+                    {
+                        $("#answer").text("Dobrze!");
+                        objects[currObject].marker.css("background-color", "lime");
+                    }
+                    else
+                    {
+                        $("#answer").text("Pomyliłeś się o "+miss+"%");
+                        objects[currObject].marker.css("background-color", "red");
+                        line.x1.baseVal.value=objects[currObject].marker.get(0).offsetLeft;
+                        line.y1.baseVal.value=objects[currObject].marker.get(0).offsetTop;
+                        line.x2.baseVal.value=(x+w/2);
+                        line.y2.baseVal.value=(y+h/2);
+                    }
+                }
+                else
+                {
+                    objects[currObject].marker.css("background-color", "cyan");
+                    currObject++;
+                    $("#answer").text(objects[currObject].dot_text)
+                }
+                picking=!picking;
+            });
+        });
+    </script>
+</body>
+</html>
