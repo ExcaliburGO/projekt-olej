@@ -1,10 +1,30 @@
+<?php require_once 'lastactive.php'; ?>
+<?php
+require_once "dbconfig.php";
+$mysqli = new mysqli($db_host, $db_user, $db_pass, $db_database) or die("BŁĄD POŁACZENIA Z BAZĄ DANYCH");
+$mapid = $_GET['id'];
+$mapid = filter_var($mapid, FILTER_SANITIZE_NUMBER_INT);
+if(!$mapid)
+{
+	http_response_code(403);
+	die('Forbidden');
+}
+$result = $mysqli->query("SELECT * FROM maps WHERE id=".$mapid);
+if($result->num_rows==0)
+{
+	http_response_code(404);
+	die('Nie znaleziono mapy.');
+}
+$map = $result->fetch_assoc();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css">
+    <title><?php echo $map['name'];?> | MrOil</title>
     <style>
         *
         {
@@ -14,7 +34,7 @@
         #map
         {
             position: absolute;
-            top:50vh;
+            top:55vh;
             left:50vw;
             transform: translate(-50%, -50%);
             height: 90vh;
@@ -35,7 +55,7 @@
         {
             position: fixed;
             margin:0;
-            top:4vh;
+            top:9vh;
             left:1vw;
             font-size:2vh;
         }
@@ -63,6 +83,33 @@
     </style>
 </head>
 <body>
+	<div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="index.php">
+                    <img src="img/MrOilLogo.png" width="50" height="50">
+                </a>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <form class="d-flex" action="search.php">
+                        <input class="form-control col-6" type="search" placeholder="Search" aria-label="Search" name="q">
+                        <button class="btn btn-outline-success" type="submit"><img src="img/SearchIcon.jpg" width="50" height="50"></button>
+                    </form>
+                </div>
+                <div class="ms-auto" id="ico1">
+                    <button class="btn btn-outline-success" type="submit"><a href="loginpage.php"><img src="img/AccountIcon.jpg" width="30" height="30"></a></button>
+                </div>
+                <div class="mr-auto" id="ico2">
+                    <button class="btn btn-outline-success" type="submit"><img src="img/SettingsIcon.jpg" width="30" height="30"></button>
+                </div>
+                <div class="mr-auto" id="ico3">
+                    <button class="btn btn-outline-success" type="submit"><a href="kontakt.php"><img src="img/InfoIcon.jpg" width="30" height="30"></img></a></button>
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </nav>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
     <div id="map">
         <img id="mapimg">
         <svg class="canvas">
@@ -73,123 +120,7 @@
     <p id="answer"></p>
     <script src="jquery-3.6.0.min.js"></script>
     <script>
-        var objects = [
-            {
-            x_pos: "76",
-            y_pos: "88",
-            dot_text: "Woliński Park Narodowy"
-            },
-            {
-            x_pos: "78",
-            y_pos: "208",
-            dot_text: "Park Narodowy Ujście Warty"
-            },
-            {
-            x_pos: "158",
-            y_pos: "161",
-            dot_text: "Drwieński Park Narodowy"
-            },
-            {
-            x_pos: "249",
-            y_pos: "112",
-            dot_text: "Park Narodowy Bory Tucholskie"
-            },
-            {
-            x_pos: "196",
-            y_pos: "246",
-            dot_text: "Wielkopolski Park Narodowy"
-            },
-            {
-            x_pos: "110",
-            y_pos: "373",
-            dot_text: "Karkonowski Park Narodowy"
-            },
-            {
-            x_pos: "159",
-            y_pos: "411",
-            dot_text: "Park Narodowy Gór Stołowych"
-            },
-            {
-            x_pos: "377",
-            y_pos: "521",
-            dot_text: "Tatrzański Park Narodowy"
-            },
-            {
-            x_pos: "354",
-            y_pos: "491",
-            dot_text: "Babiogórski Park Narodowy"
-            },
-            {
-            x_pos: "394",
-            y_pos: "485",
-            dot_text: "Gorczański Park Narodowy"
-            },
-            {
-            x_pos: "408",
-            y_pos: "506",
-            dot_text: "Pieniński Park Narodowy"
-            },
-            {
-            x_pos: "469",
-            y_pos: "502",
-            dot_text: "Magurski Park Narodowy"
-            },
-            {
-            x_pos: "545",
-            y_pos: "530",
-            dot_text: "Bieszczadzki Park Narodowy"
-            },
-            {
-            x_pos: "392",
-            y_pos: "430",
-            dot_text: "Ojcowski Park Narodowy"
-            },
-            {
-            x_pos: "439",
-            y_pos: "389",
-            dot_text: "Świętokrzyski Park Narodowy"
-            },
-            {
-            x_pos: "573",
-            y_pos: "397",
-            dot_text: "Roztoczański Park Narodowy"
-            },
-            {
-            x_pos: "564",
-            y_pos: "321",
-            dot_text: "Poleski Park Narodowy"
-            },
-            {
-            x_pos: "592",
-            y_pos: "200",
-            dot_text: "Białowieski Park Narodowy"
-            },
-            {
-            x_pos: "542",
-            y_pos: "183",
-            dot_text: "Narwiański Park Narodowy"
-            },
-            {
-            x_pos: "532",
-            y_pos: "131",
-            dot_text: "Biebrzański Park Narodowy"
-            },
-            {
-            x_pos: "539",
-            y_pos: "85",
-            dot_text: "Wigierski Park Narodowy"
-            },
-            {
-            x_pos: "410",
-            y_pos: "250",
-            dot_text: "Kampinoski Park Narodowy"
-            },
-            {
-            x_pos: "234",
-            y_pos: "32",
-            dot_text: "Słowiański Park Narodowy"
-            }
-        ]
+        var objects = <?php echo $map['points']; ?>;
         objects.sort((a, b) => 0.5 - Math.random());
         var currObject=0;
         var picking=true;
